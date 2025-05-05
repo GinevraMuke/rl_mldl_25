@@ -26,8 +26,8 @@ from env.custom_hopper import *
 
 
 def main():
-	# env = gym.make('CustomHopper-source-v0')
-	env = gym.make('CustomHopper-target-v0')
+	env = gym.make('CustomHopper-source-v0')
+	#env = gym.make('CustomHopper-target-v0')
 
 	print('State space:', env.observation_space) # state-space
 	print('Action space:', env.action_space) # action-space
@@ -38,7 +38,7 @@ def main():
 
 	for episode in range(n_episodes):
 		done = False
-		#state = env.reset()	# Reset environment to initial state
+		state = env.reset()	# Reset environment to initial state
 
 		while not done:  # Until the episode is over
 

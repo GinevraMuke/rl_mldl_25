@@ -5,7 +5,7 @@ import torch
 import gym
 
 from env.custom_hopper import *
-from agent import Agent, Policy
+from agent_Reinforce import Agent, Policy
 
 def parse_args():
     parser = argparse.ArgumentParser()
@@ -17,6 +17,15 @@ def parse_args():
     return parser.parse_args()
 
 args = parse_args()
+
+'''
+In the previous lines we have defined arguments to pass to the main. These arguments are then saved
+in the global variable args such that are visible in every part of the program. Every argument has his 
+default value, but you can specify every argument from the terminal when you throw the script. For example
+since we have saved, through train.py, the weights of the REINFORCE network into the repo "models" when
+you run the script you have to write from the terminal:
+python test.py --model /home/ginevramuke/rl_mldl_25/models/REINFORCE.mdl --episodes 100
+'''
 
 
 def main():
@@ -32,7 +41,7 @@ def main():
 	action_space_dim = env.action_space.shape[-1]
 
 	policy = Policy(observation_space_dim, action_space_dim)
-	policy.load_state_dict(torch.load(args.model), strict=True)
+	policy.load_state_dict(torch.load(args.model), strict=True) #load the model from the path specified in args.model
 
 	agent = Agent(policy, device=args.device)
 
