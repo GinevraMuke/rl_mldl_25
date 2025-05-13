@@ -4,10 +4,9 @@
 import argparse
 
 import torch
-import gym
 
 from env.custom_hopper import *
-from agent_Reinforce import Agent, Policy
+from reinforce.agent_Reinforce import Agent, Policy
 
 
 def parse_args():

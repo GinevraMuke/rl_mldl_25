@@ -2,10 +2,9 @@
 import argparse
 
 import torch
-import gym
 
 from env.custom_hopper import *
-from agent_Reinforce import Agent, Policy
+from actor_critic.agent_actorCritic import Agent, Policy
 
 def parse_args():
     parser = argparse.ArgumentParser()
@@ -30,8 +29,8 @@ python test.py --model /home/ginevramuke/rl_mldl_25/models/REINFORCE.mdl --episo
 
 def main():
 
-	env = gym.make('CustomHopper-source-v0')
-	# env = gym.make('CustomHopper-target-v0')
+	#env = gym.make('CustomHopper-source-v0')
+	env = gym.make('CustomHopper-target-v0')
 
 	print('Action space:', env.action_space)
 	print('State space:', env.observation_space)
