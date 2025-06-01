@@ -4,9 +4,14 @@
 import argparse
 
 import torch
+import wandb
+import sys
+import os
 
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from env.custom_hopper import *
-from reinforce.agent_Reinforce import Agent, Policy
+
+from task_2_3.actor_critic.agent_actorCritic import Agent, Policy
 
 
 def parse_args():
@@ -23,6 +28,14 @@ args = parse_args()
 def main():
     env = gym.make('CustomHopper-source-v0')
     # env = gym.make('CustomHopper-target-v0')
+
+    #WANDB configuration
+    run = wandb.init(
+        project="actor_critic",
+        config = {
+            "n_episodes": args.n_episodes,
+        }
+    )
 
     print('Action space:', env.action_space)
     print('State space:', env.observation_space)
@@ -46,20 +59,23 @@ def main():
             action, action_log_prob = agent.get_action(state)
             previous_state = state
             state, reward, done, info = env.step(action.detach().cpu().numpy())
-
-            agent.store_outcome(previous_state, state, action_log_prob, reward, done)
+            agent.store_outcome(previous_state, state, action_log_prob, reward, done) #so agent.states[0] will contain the first state and agent.next_states[0] will contain the second state
             train_reward += reward
-
-        agent.update_policy() #at the end of the trajectory updates the weights of the policy
+            agent.update_policy()
+        #track reward progress on wandb for multiple trajectories
+        run.log({"run on episode" : train_reward,
+                 "episode" : episode
+                 })
 
         if (episode + 1) % args.print_every == 0:
             print('Training episode:', episode)
             print('Episode return:', train_reward)
 
-    torch.save(agent.policy.state_dict(), "/home/ginevramuke/rl_mldl_25/models/REINFORCE_baseline.mdl") #basically this line is saving the parameters of the model (agent.policy.state_dict are the parameters)
+    torch.save(agent.policy.state_dict(), "/home/ginevramuke/rl_mldl_25/models/actor_critic.mdl") #basically this line is saving the parameters of the model (agent.policy.state_dict are the parameters)
+    run.finish()
 
 
-	
+
 
 if __name__ == '__main__':
     main()

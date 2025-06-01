@@ -2,9 +2,12 @@
 import argparse
 
 import torch
+import sys
+import os
 
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from env.custom_hopper import *
-from actor_critic.agent_actorCritic import Agent, Policy
+from task_2_3.actor_critic.agent_actorCritic import Agent, Policy
 
 def parse_args():
     parser = argparse.ArgumentParser()
