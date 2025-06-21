@@ -11,7 +11,7 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from env.custom_hopper import *
 
-from task_2_3.actor_critic.agent_actorCritic import Agent, Policy
+from projectExtension.task_2_3.actor_critic.agent_actorCritic import Agent, Policy
 
 
 def parse_args():
