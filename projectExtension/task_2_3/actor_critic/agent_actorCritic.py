@@ -28,7 +28,7 @@ class Policy(torch.nn.Module):
         super().__init__()
         self.state_space = state_space
         self.action_space = action_space
-        self.hidden = 64
+        self.hidden = 256
         self.tanh = torch.nn.Tanh()
 
         """
