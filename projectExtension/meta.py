@@ -68,10 +68,13 @@ def collect_trajectories(env, policy : Policy, num_steps: int):
         print(key)
         np_array = np.array(value_list)
         print(np_array.shape)
-        if key in ['states', 'vals', 'rewards', 'dones']:
+
+        if key in ['states', 'vals', 'rewards', 'probs']:  # states, vals, rewards, probs
             dtype = torch.float
-        else:  # actions, probs
-            dtype = torch.long if key == 'actions' else torch.float
+        elif key == 'actions':  # actions
+            dtype = torch.long
+        else: # 'dones' (booleani)
+            dtype = torch.bool
 
         trajectory_data[key] = torch.tensor(np_array, dtype=dtype)
 
@@ -81,7 +84,7 @@ def collect_trajectories(env, policy : Policy, num_steps: int):
 def calculate_ppo_loss(
         trajectories: dict,
         actor_critic,
-        n_epochs: int = 10,
+        n_epochs: int = 2,
         batch_size: int = 64,
         gae_lambda: float = 0.95,
         policy_clip: float = 0.2,
@@ -170,9 +173,9 @@ def calculate_ppo_loss(
 # --- IPERPARAMETRI ---
 META_LR = 1e-3  # Learning rate del ciclo esterno
 INNER_LR = 1e-2  # Learning rate del ciclo interno
-META_BATCH_SIZE = 10  # Numero di task per meta-update
+META_BATCH_SIZE = 2  # Numero di task per meta-update
 INNER_UPDATES = 1  # Numero di passi di gradiente nel ciclo interno
-NUM_META_ITERATIONS = 500
+NUM_META_ITERATIONS = 10
 
 # --- SETUP ---
 env = gym.make('CustomHopper-source-v0', udr_ranges={'thigh': 0.5, 'leg': 0.5, 'foot': 0.5})
@@ -207,23 +210,26 @@ for meta_iter in range(NUM_META_ITERATIONS):
             # 3. --- CICLO INTERNO (ADATTAMENTO) ---
             for _ in range(INNER_UPDATES):
                 # a. Raccogli dati (support set) con la policy corrente (fast_policy)
-                support_trajectories = collect_trajectories(env, fast_policy, num_steps=2048)
+                support_trajectories = collect_trajectories(env, fast_policy, num_steps=512)
+                print(f"support trajectories done.")
 
                 # b. Calcola la loss di RL sul support set
                 inner_loss = calculate_ppo_loss(support_trajectories, fast_policy)  # Usiamo la stessa rete per actor e critic
+                print(f"ppo loss done.")
 
                 # c. Aggiorna i parametri della copia (fast_policy)
                 # Questo aggiornamento viene tracciato da `higher`
                 diff_optim.step(inner_loss)
+                print(f"step done.")
 
             # 4. --- VALUTAZIONE PER IL META-UPDATE ---
             # a. Raccogli nuovi dati (query set) con la policy *adattata*
-            query_trajectories = collect_trajectories(env, fast_policy, num_steps=2048)
+            query_trajectories = collect_trajectories(env, fast_policy, num_steps=512)
 
             # b. Calcola la meta-loss sul query set
             # Il gradiente di questa loss si propagherà indietro fino ai
             # parametri originali `meta_policy` (theta).
-            outer_loss = calculate_ppo_loss(query_trajectories, fast_policy, fast_policy)
+            outer_loss = calculate_ppo_loss(query_trajectories, fast_policy)
 
             # Aggiungi la loss del task corrente alla lista
             meta_losses.append(outer_loss)
