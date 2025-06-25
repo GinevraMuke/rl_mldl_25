@@ -82,7 +82,9 @@ class CustomHopper(MujocoEnv, utils.EzPickle):
         alive_bonus = 1.0
         reward = (posafter - posbefore) / self.dt
         reward += alive_bonus
+
         reward -= 1e-3 * np.square(a).sum()
+
         s = self.state_vector()
         done = not (np.isfinite(s).all() and (np.abs(s[2:]) < 100).all() and (height > .7) and (abs(ang) < .2))
         ob = self._get_obs()

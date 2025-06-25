@@ -10,14 +10,13 @@ import os
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from env.custom_hopper import *
-
-from projectExtension.task_2_3.actor_critic.agent_actorCritic import Agent, Policy
+from task_2_3.actor_critic.agent_actorCritic import Agent, Policy
 
 
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--n-episodes', default=100000, type=int, help='Number of training episodes')
-    parser.add_argument('--print-every', default=20000, type=int, help='Print info every <> episodes')
+    parser.add_argument('--print-every', default=100, type=int, help='Print info every <> episodes')
     parser.add_argument('--device', default='cpu', type=str, help='network device [cpu, cuda]')
 
     return parser.parse_args()
@@ -59,6 +58,7 @@ def main():
             action, action_log_prob = agent.get_action(state)
             previous_state = state
             state, reward, done, info = env.step(action.detach().cpu().numpy())
+            print(f"tot reward{reward}")
             agent.store_outcome(previous_state, state, action_log_prob, reward, done) #so agent.states[0] will contain the first state and agent.next_states[0] will contain the second state
             train_reward += reward
             agent.update_policy()

@@ -38,7 +38,6 @@ args = parse_args()
 
 
 def train(args : argparse.Namespace):
-
     training_env = Monitor(gym.make(args.env))
     # eval is a function that turns a string into a python code, in our case is needed
     # because we pass as argument to the script a string containing our configuration as a dictionary

@@ -24,7 +24,7 @@ import gym
 import sys
 import os
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+#sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from env.custom_hopper import *
 
 
@@ -40,6 +40,7 @@ def main():
 	render = True
 
 	for episode in range(n_episodes):
+		test_reward = 0
 		done = False
 		state = env.reset()	# Reset environment to initial state
 
@@ -51,6 +52,10 @@ def main():
 
 			if render:
 				env.render() #launch the graphic simulation
+
+			test_reward += reward
+
+		print(f"Episode: {episode} | Return: {test_reward}")
 
 	
 
