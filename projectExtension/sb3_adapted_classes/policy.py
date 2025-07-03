@@ -3,17 +3,18 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.distributions import Normal
 import numpy as np
+from stable_baselines3.common.utils import obs_as_tensor
 
 
 class Policy(nn.Module):
     '''
     A classic network architecture with some more methods for ensure compatibility with sb3 classes
     '''
-    def __init__(self, state_space, action_space):
+    def __init__(self, state_space, action_space, hidden_dim = 64):
         super().__init__()
         self.state_space = state_space
         self.action_space = action_space
-        self.hidden = 64
+        self.hidden = hidden_dim
 
         # --- Architecture ---
         self.actor_net = nn.Sequential(
@@ -112,3 +113,8 @@ class Policy(nn.Module):
 
     def reset_noise(self, *_):
         pass
+
+    def obs_to_tensor(self, observation: np.ndarray) -> torch.Tensor:
+        # convert a numpy observation to torch tensor (used for compatibility with sb3)
+        device = next(self.parameters()).device
+        return obs_as_tensor(observation, device)

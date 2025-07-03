@@ -36,7 +36,7 @@ from stable_baselines3.common.vec_env import (
     unwrap_vec_normalize,
 )
 SelfBaseAlgorithm = TypeVar("SelfBaseAlgorithm", bound="BaseAlgorithm")
-from policy import Policy
+from sb3_adapted_classes.policy import Policy
 
 class BaseAlgorithm(ABC):
     """

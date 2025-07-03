@@ -17,7 +17,7 @@ from stable_baselines3.common.vec_env import (
 )
 SelfBaseAlgorithm = TypeVar("SelfBaseAlgorithm", bound="BaseAlgorithm")
 SelfOnPolicyAlgorithm = TypeVar("SelfOnPolicyAlgorithm", bound="OnPolicyAlgorithm")
-from BaseAlgorithm import BaseAlgorithm
+from sb3_adapted_classes.BaseAlgorithm import BaseAlgorithm
 
 
 class OnPolicyAlgorithm(BaseAlgorithm):
@@ -204,7 +204,7 @@ class OnPolicyAlgorithm(BaseAlgorithm):
                     and infos[idx].get("terminal_observation") is not None
                     and infos[idx].get("TimeLimit.truncated", False)
                 ):
-                    terminal_obs = self.policy.obs_to_tensor(infos[idx]["terminal_observation"])[0]
+                    terminal_obs = self.policy.obs_to_tensor(infos[idx]["terminal_observation"])
                     with th.no_grad():
                         terminal_value = self.policy.predict_values(terminal_obs)[0]
                     rewards[idx] += self.gamma * terminal_value
