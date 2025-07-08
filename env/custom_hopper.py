@@ -12,7 +12,7 @@ from .mujoco_env import MujocoEnv
 
 
 class CustomHopper(MujocoEnv, utils.EzPickle):
-    def __init__(self, domain=None):
+    def __init__(self, udr_ranges = None, domain=None):
         MujocoEnv.__init__(self, 4)
         utils.EzPickle.__init__(self)
 
@@ -20,6 +20,8 @@ class CustomHopper(MujocoEnv, utils.EzPickle):
 
         if domain == 'source':  # Source environment has an imprecise torso mass (-30% shift)
             self.sim.model.body_mass[1] *= 0.7
+
+        self.udr_ranges = udr_ranges
 
     def set_random_parameters(self):
         """Set random masses"""
@@ -32,11 +34,28 @@ class CustomHopper(MujocoEnv, utils.EzPickle):
         #
         # TASK 6: implement domain randomization. Remember to sample new dynamics parameter
         #         at the start of each training episode.
-        
-        raise NotImplementedError()
 
-        return
+        '''
+        this function iterate over the configuration of ranges (udr_ranges) passed during training.
+        udr_ranges is something like:
+        mass_feet : 0.5 -> that means that the mass could vary from -50% of original mass to +50% of original mass
+        mass_calf : 0.6 -> that means that the mass could vary from -60% of original mass to +60% of original mass
+        ...
+        Clearly two things are FUNDAMENTAL when we pass the configuration in train_6.py:
+        1) the keys of udr_ranges must be in the same order of self.original_masses
+        2) udr_ranges must be of the correct format
+        3) the multiplier must be between 0 and 1
+        '''
 
+        if self.udr_ranges is None:
+            raise ValueError("you must pass a configuration of ranges of hyperparameters of UDR")
+        masses = [self.sim.model.body_mass[1]] #torso must stay unchanged
+        for i, mass in enumerate(self.original_masses[1:]):
+            multiplier = list(self.udr_ranges.values())[i]
+            lower_bound = mass * (1 - multiplier)
+            upper_bound = mass * (1 + multiplier)
+            masses.append(self.np_random.uniform(low=lower_bound, high=upper_bound))
+        return masses
 
     def get_parameters(self):
         """Get value of mass for each link"""
@@ -144,4 +163,3 @@ gym.envs.register(
         max_episode_steps=500,
         kwargs={"domain": "target"}
 )
-
