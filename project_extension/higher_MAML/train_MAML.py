@@ -1,6 +1,9 @@
 import torch as th
 from torch import optim
 from sb3_adapted_classes.policy import Policy
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 from env.custom_hopper import *
 from sb3_adapted_classes.PPO import PPO
 import wandb

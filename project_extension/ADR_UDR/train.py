@@ -14,9 +14,9 @@ from stable_baselines3.common.utils import get_linear_fn
 from wandb.integration.sb3 import WandbCallback
 
 # Add project root to path
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 from env.custom_hopper import *
-from ADR_PPO.adr import AutomaticDomainRandomizer
+from adr import AutomaticDomainRandomizer
 
 
 def parse_args():

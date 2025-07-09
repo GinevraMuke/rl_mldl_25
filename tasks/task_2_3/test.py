@@ -5,12 +5,12 @@ import torch
 import sys
 import os
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 from env.custom_hopper import *
-from projectExtension.task_2_3.actor_critic.agent_actorCritic import Agent, Policy
 
 def parse_args():
     parser = argparse.ArgumentParser()
+    parser.add_argument('--algorithm', default='actor-critic', type=str, choices=['actor-critic', 'reinforce'])
     parser.add_argument('--model', default=None, type=str, help='Model path')
     parser.add_argument('--device', default='cpu', type=str, help='network device [cpu, cuda]')
     parser.add_argument('--render', default=False, action='store_true', help='Render the simulator')
@@ -32,13 +32,18 @@ python test.py --model /home/ginevramuke/rl_mldl_25/models/REINFORCE.mdl --episo
 
 def main():
 
+	if args.algorithm == 'actor-critic':
+		from tasks.task_2_3.agent_actorCritic import Agent, Policy
+	elif args.algorithm == 'reinforce':
+		from tasks.task_2_3.agent_Reinforce import Agent, Policy
+
 	#env = gym.make('CustomHopper-source-v0')
 	env = gym.make('CustomHopper-target-v0')
 
 	print('Action space:', env.action_space)
 	print('State space:', env.observation_space)
 	print('Dynamics parameters:', env.get_parameters())
-	
+
 	observation_space_dim = env.observation_space.shape[-1]
 	action_space_dim = env.action_space.shape[-1]
 
@@ -64,7 +69,7 @@ def main():
 			test_reward += reward
 
 		print(f"Episode: {episode} | Return: {test_reward}")
-	
+
 
 if __name__ == '__main__':
 	main()
